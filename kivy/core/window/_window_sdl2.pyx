@@ -469,7 +469,8 @@ cdef class _WindowSDL2Storage:
     def show_keyboard(self,
                       system_keyboard,
                       softinput_mode,
-                      input_type="text", keyboard_suggestions=True):
+                      input_type="text",
+                      keyboard_suggestions=True):
         if SDL_IsTextInputActive():
             return
         cdef SDL_Rect *rect = <SDL_Rect *>PyMem_Malloc(sizeof(SDL_Rect))
@@ -516,9 +517,7 @@ cdef class _WindowSDL2Storage:
 
                 from android import mActivity
 
-                keyboardInputTypes = mActivity.keyboardInputTypes
-
-            # InputType values, from Android documentation
+                # InputType values, from Android documentation
 
                 TYPE_CLASS_DATETIME = 4
                 TYPE_CLASS_NUMBER = 2
@@ -544,10 +543,10 @@ cdef class _WindowSDL2Storage:
                 if keyboard_suggestions and input_type == "text":
                     input_types |= TYPE_TEXT_FLAG_AUTO_COMPLETE
 
-                if input_types != keyboardInputTypes:
-                    mActivity.showKeyboard(input_types)
-
             SDL_StartTextInput()
+
+            if platform == "android":
+                mActivity.showKeyboard(input_types)
         finally:
             PyMem_Free(<void *>rect)
 
