@@ -545,7 +545,7 @@ cdef class _WindowSDL2Storage:
                     input_types |= TYPE_TEXT_FLAG_AUTO_COMPLETE
 
                 if input_types != keyboardInputTypes:
-                    keyboardInputTypes = input_types
+                    mActivity.showKeyboard(input_types)
 
             SDL_StartTextInput()
         finally:
