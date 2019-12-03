@@ -466,7 +466,10 @@ cdef class _WindowSDL2Storage:
         SDL_DestroyWindow(self.win)
         SDL_Quit()
 
-    def show_keyboard(self, system_keyboard, softinput_mode):
+    def show_keyboard(self,
+                      system_keyboard,
+                      softinput_mode,
+                      input_type="text", keyboard_suggestions=True):
         if SDL_IsTextInputActive():
             return
         cdef SDL_Rect *rect = <SDL_Rect *>PyMem_Malloc(sizeof(SDL_Rect))
@@ -493,7 +496,6 @@ cdef class _WindowSDL2Storage:
                     ) if target else 0
                     rect.w = max(0, target.width) if target else 0
                     rect.h = max(0, target.height) if target else 0
-                    SDL_SetTextInputRect(rect)
                 elif softinput_mode == 'pan':
                     # tell Android the TextInput is at the screen
                     # bottom, so that it always pans
@@ -501,7 +503,6 @@ cdef class _WindowSDL2Storage:
                     rect.x = 0
                     rect.w = wx
                     rect.h = 5
-                    SDL_SetTextInputRect(rect)
                 else:
                     # Supporting 'resize' needs to call the Android
                     # API to set ADJUST_RESIZE mode, and change the
@@ -510,7 +511,41 @@ cdef class _WindowSDL2Storage:
                     rect.x = 0
                     rect.w = 10
                     rect.h = 1
-                    SDL_SetTextInputRect(rect)
+
+                SDL_SetTextInputRect(rect)
+
+                from android import mActivity
+
+                keyboardInputTypes = mActivity.keyboardInputTypes
+
+            # InputType values, from Android documentation
+
+                TYPE_CLASS_DATETIME = 4
+                TYPE_CLASS_NUMBER = 2
+                TYPE_CLASS_PHONE = 3
+                TYPE_CLASS_TEXT = 1
+                TYPE_TEXT_FLAG_AUTO_COMPLETE = 65536
+                TYPE_TEXT_VARIATION_EMAIL_ADDRESS = 32
+                TYPE_TEXT_VARIATION_URI = 16
+                TYPE_TEXT_VARIATION_NORMAL = 0
+                TYPE_TEXT_VARIATION_POSTAL_ADDRESS = 112
+
+                input_types = {
+                    "text": TYPE_CLASS_TEXT,
+                    "number": TYPE_CLASS_NUMBER,
+                    "url": TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_URI,
+                    "mail":
+                    TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                    "datetime": TYPE_CLASS_DATETIME,
+                    "tel": TYPE_CLASS_PHONE,
+                    "address": TYPE_TEXT_VARIATION_POSTAL_ADDRESS
+                    }.get(input_type, "text")
+
+                if keyboard_suggestions and input_type == "text":
+                    input_types |= TYPE_TEXT_FLAG_AUTO_COMPLETE
+
+                if input_types != keyboardInputTypes:
+                    keyboardInputTypes = input_types
 
             SDL_StartTextInput()
         finally:

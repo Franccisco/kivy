@@ -236,6 +236,15 @@ class FocusBehavior(object):
         :attr:`focused` is an alias of :attr:`focus` and will be removed in
         2.0.0.
     '''
+    keyboard_suggestions = BooleanProperty(True)
+    '''If True provides auto suggestions on top of keyboard.
+    This will only work if :attr:`input_type` is set to `text`.
+
+    .. versionadded:: 1.8.0
+
+    :attr:`keyboard_suggestions` is a :class:`~kivy.properties.BooleanProperty`
+    and defaults to True.
+    '''
 
     def _set_on_focus_next(self, instance, value):
         ''' If changing code, ensure following code is not infinite loop:
@@ -390,7 +399,10 @@ class FocusBehavior(object):
             self._requested_keyboard = True
             keyboard = self._keyboard =\
                 EventLoop.window.request_keyboard(
-                    self._keyboard_released, self, input_type=self.input_type)
+                    self._keyboard_released,
+                    self,
+                    input_type=self.input_type,
+                    keyboard_suggestions=self.keyboard_suggestions)
             keyboards = FocusBehavior._keyboards
             if keyboard not in keyboards:
                 keyboards[keyboard] = None
