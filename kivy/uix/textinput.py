@@ -329,6 +329,9 @@ class TextInputCutCopyPaste(Bubble):
         finally:
             touch.pop()
 
+    def on_textedit(self, instance, value):
+        self.on_textinput(instance, value)
+
     def on_textinput(self, instance, value):
         global Clipboard
         if value and not Clipboard and not _is_desktop:
