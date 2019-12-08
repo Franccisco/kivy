@@ -2588,6 +2588,8 @@ class TextInput(FocusBehavior, Widget):
         self.insert_text(text, False)
 
     def keyboard_on_textedit(self, window, text):
+        print(window)
+        print(text)
         if self._selection:
             self.delete_selection()
         self.insert_text(text, False)
