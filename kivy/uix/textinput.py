@@ -2588,7 +2588,9 @@ class TextInput(FocusBehavior, Widget):
         self.insert_text(text, False)
 
     def keyboard_on_textedit(self, window, text):
-        self.keyboard_on_textinput(window, text)
+        if self._selection:
+            self.delete_selection()
+        self.insert_text(text, False)
 
     def on__hint_text(self, instance, value):
         self._refresh_hint_text()
