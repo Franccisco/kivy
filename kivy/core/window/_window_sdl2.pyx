@@ -523,11 +523,11 @@ cdef class _WindowSDL2Storage:
                 TYPE_CLASS_NUMBER = 2
                 TYPE_CLASS_PHONE = 3
                 TYPE_CLASS_TEXT = 1
-                TYPE_TEXT_FLAG_AUTO_COMPLETE = 65536
                 TYPE_TEXT_VARIATION_EMAIL_ADDRESS = 32
                 TYPE_TEXT_VARIATION_URI = 16
                 TYPE_TEXT_VARIATION_NORMAL = 0
                 TYPE_TEXT_VARIATION_POSTAL_ADDRESS = 112
+                TYPE_TEXT_FLAG_NO_SUGGESTIONS = 524288
 
                 input_types = {
                     "text": TYPE_CLASS_TEXT,
@@ -537,16 +537,19 @@ cdef class _WindowSDL2Storage:
                     TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
                     "datetime": TYPE_CLASS_DATETIME,
                     "tel": TYPE_CLASS_PHONE,
-                    "address": TYPE_TEXT_VARIATION_POSTAL_ADDRESS
+                    "address":
+                    TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_POSTAL_ADDRESS
                     }.get(input_type, "text")
 
-                if keyboard_suggestions and input_type == "text":
-                    input_types |= TYPE_TEXT_FLAG_AUTO_COMPLETE
+                if not keyboard_suggestions and input_type in ("text",
+                                                               "url",
+                                                               "mail",
+                                                               "address"):
+                    input_types |= TYPE_TEXT_FLAG_NO_SUGGESTIONS
+
+                mActivity.changeKeyboard(input_types)
 
             SDL_StartTextInput()
-
-            if platform == "android":
-                mActivity.showKeyboard(input_types)
         finally:
             PyMem_Free(<void *>rect)
 
