@@ -329,9 +329,6 @@ class TextInputCutCopyPaste(Bubble):
         finally:
             touch.pop()
 
-    def on_textedit(self, instance, value):
-        self.on_textinput(instance, value)
-
     def on_textinput(self, instance, value):
         global Clipboard
         if value and not Clipboard and not _is_desktop:
@@ -2589,6 +2586,9 @@ class TextInput(FocusBehavior, Widget):
         if self._selection:
             self.delete_selection()
         self.insert_text(text, False)
+
+    def keyboard_on_textedit(self, window, text):
+        self.keyboard_on_textinput(window, text)
 
     def on__hint_text(self, instance, value):
         self._refresh_hint_text()
