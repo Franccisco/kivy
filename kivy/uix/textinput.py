@@ -2582,17 +2582,20 @@ class TextInput(FocusBehavior, Widget):
             key = (None, None, k, 1)
             self._key_up(key)
 
-    def keyboard_on_textinput(self, window, text):
+    def base_on_textinput(self, window, text):
         if self._selection:
             self.delete_selection()
         self.insert_text(text, False)
+        self.editing_text = False
+
+    def keyboard_on_textinput(self, window, text):
+        if self.editing_text:
+            return
+        self.base_on_textinput(window, text)
 
     def keyboard_on_textedit(self, window, text):
-        print(window)
-        print(text)
-        if self._selection:
-            self.delete_selection()
-        self.insert_text(text, False)
+        self.editing_text = True
+        self.base_on_textinput(window, text)
 
     def on__hint_text(self, instance, value):
         self._refresh_hint_text()
