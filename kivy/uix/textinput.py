@@ -528,6 +528,8 @@ class TextInput(FocusBehavior, Widget):
             308: 'alt_L',
             307: 'alt_R'}
 
+        self.editing_text = False
+
         super(TextInput, self).__init__(**kwargs)
 
         fbind = self.fbind
