@@ -468,7 +468,7 @@ cdef class _WindowSDL2Storage:
         SDL_DestroyWindow(self.win)
         SDL_Quit()
 
-    def show_keyboard(self, system_keyboard, softinput_mode):
+    def show_keyboard(self, system_keyboard, softinput_mode, input_type):
         if SDL_IsTextInputActive():
             return
         cdef SDL_Rect *rect = <SDL_Rect *>PyMem_Malloc(sizeof(SDL_Rect))
@@ -476,6 +476,8 @@ cdef class _WindowSDL2Storage:
             raise MemoryError('Memory error in rect allocation')
         try:
             if platform == 'android':
+                import android.show_keyboard
+
                 # This could probably be safely done on every platform
                 # (and should behave correctly with e.g. the windows
                 # software keyboard), but this hasn't been tested
@@ -513,6 +515,8 @@ cdef class _WindowSDL2Storage:
                     rect.w = 10
                     rect.h = 1
                     SDL_SetTextInputRect(rect)
+
+                android.show_keyboard(system_keyboard.target, input_type)
 
             SDL_StartTextInput()
         finally:
